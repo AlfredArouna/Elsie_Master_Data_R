@@ -1,0 +1,32 @@
+Reçois en fichier attaché, les données. j'ai des données de 3 jours, et pour chaque journée il y a 4 courbe a trace (en couleur différentes)  sur le même graphe en fonction du temps. stp si tu peux faire en sorte (corriger les données) pou que toutes les courbes présentent une allure croissantes et complètement vers la fin, pour 3 lignes excel décroît. je ferai moi même les interprétations.
+Merci beaucoup.
+
+
+d1 = read.csv("/home//aang/Downloads/essaie_memoire_elsie/donnees_jour_1.csv", header = TRUE)
+
+
+ggplot(d1, aes(x=temps)) + geom_line(aes(y=interieur_recipient), colour="red") + geom_line(aes(y=interieur_serre), colour="blue") + ylab(label = "Valeurs") + xlab("Temps")
+
+
+## Meilleure option
+library("reshape2")
+tab1 <- melt(d1, id="temps")
+ggplot(tab1, aes(x=temps, y=value, colour= variables) ) + geom_line() + ylab(label = "Valeurs") + xlab("Temps") +scale_colour_manual(values=c("red","yellow", "green", "blue"))
+
+ggplot(tab1, aes(x=temps, y=value, colour= variable) ) + geom_boxplot() + ylab(label = "Valeurs") + xlab("Temps")
+
+ggplot(tab2, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Valeurs") + xlab("Temps")
+
+
+library('cowplot')
+plot3 <- ggplot(tab3, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Valeurs") + xlab("Temps")
+plot1 <- ggplot(tab1, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Valeurs") + xlab("Temps")
+plot2 <- ggplot(tab2, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Valeurs") + xlab("Temps")
+
+plot_grid(plot1, plot2, plot3, labels = c('Jour 1', 'Jour 2', 'Jour 3'), ncol = 3, nrow = 1)
+
+
+#### Affichage par temps de 3600 s
+http://stackoverflow.com/questions/11335836/increase-number-of-axis-ticks-in-ggplot2
+
+ggplot(tab1, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Température (°C)") + xlab("Temps (s)") + scale_x_continuous(breaks=seq(from=0, by=3600, to=max(tab1$temps)) )

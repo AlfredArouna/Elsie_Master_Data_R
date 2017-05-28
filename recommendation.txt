@@ -1,0 +1,82 @@
+Reçois en fichier attaché, les données. j'ai des données de 3 jours, et pour chaque journée il y a 4 courbe a trace (en couleur différentes)  sur le même graphe en fonction du temps. stp si tu peux faire en sorte (corriger les données) pou que toutes les courbes présentent une allure croissantes et complètement vers la fin, pour 3 lignes excel décroît. je ferai moi même les interprétations.
+Merci beaucoup.
+
+
+d1 = read.csv("/home//aang/Downloads/essaie_memoire_elsie/donnees_jour_1.csv", header = TRUE)
+
+
+ggplot(d1, aes(x=temps)) + geom_line(aes(y=interieur_recipient), colour="red") + geom_line(aes(y=interieur_serre), colour="blue") + ylab(label = "Valeurs") + xlab("Temps")
+
+
+## Meilleure option
+library("reshape2")
+tab1 <- melt(d1, id="temps")
+ggplot(tab1, aes(x=temps, y=value, colour= variables) ) + geom_line() + ylab(label = "Valeurs") + xlab("Temps") +scale_colour_manual(values=c("red","yellow", "green", "blue"))
+
+ggplot(tab1, aes(x=temps, y=value, colour= variable) ) + geom_boxplot() + ylab(label = "Valeurs") + xlab("Temps")
+
+ggplot(tab2, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Valeurs") + xlab("Temps")
+
+
+library('cowplot')
+plot3 <- ggplot(tab3, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Valeurs") + xlab("Temps")
+plot1 <- ggplot(tab1, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Valeurs") + xlab("Temps")
+plot2 <- ggplot(tab2, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Valeurs") + xlab("Temps")
+
+
+
+
+
+
+
+
+
+
+
+> d111 <- subset(d11, Temps%%100==0, select = c(Temps,Teau,Tis,Tamb,Tcr))
+> tab111 <- melt(d111, id="Temps")
+ggplot(tab111, aes(x=Temps, y=value, colour= variable) ) + geom_point(shape=4)  + ylab(label = "Valeurs") + xlab("Temps")
+
+plot_grid(plot1, plot2, plot3, labels = c('Jour 1', 'Jour 2', 'Jour 3'), ncol = 3, nrow = 1)
+
+
+#### Affichage par temps de 3600 s
+http://stackoverflow.com/questions/11335836/increase-number-of-axis-ticks-in-ggplot2
+http://www.sthda.com/english/wiki/ggplot2-axis-ticks-a-guide-to-customize-tick-marks-and-labels
+http://www.noamross.net/blog/2012/10/5/ggplot-introduction.html
+http://seananderson.ca/2013/10/19/reshape.html
+https://vzemlys.wordpress.com/2010/01/06/time-series-data-aggregation-using-r-and-reshape/
+ggplot(tab1, aes(x=temps, y=value, colour= variable) ) + geom_smooth() + ylab(label = "Température (°C)") + xlab("Temps (s)") + scale_x_continuous(breaks=seq(from=0, by=3600, to=max(tab1$temps)) )
+
+Ecrire code
+For each 100 Temps
+ get max Teau (from 0 to 100) (100 to 200) etc
+ get max Tis
+ get max Tamb
+ get max Tcr
+
+> d1_100 <- subset(d1, Temps >= 1 & Temps <=100)
+> d1_200 <- subset(d1, Temps >= 100 & Temps <=200)
+> d1_300 <- subset(d1, Temps >= 200 & Temps <=300)
+> d1_400 <- subset(d1, Temps >= 300 & Temps <=400)
+
+
+dataF <- data.frame(Temps=integer(),
+                 Teau=double(),
+                 Tis=double(),
+                 Tamb=double(),
+                 Tcr=double())
+j <- 0
+for(i in d1$Temps) 
+{
+  if (i%%100==0){ 
+    tmp <- subset(d1, d1$Temps >= j & d1$Temps <= i)
+    new <- c(i, max(tmp$Teau), max(tmp$Tis), max(tmp$Tamb), max(tmp$Tcr))
+    dataF <- rbind(dataF, new)
+    j <- i 
+    print(new)
+  }
+}
+colnames(dataF) <- c("Temps","Teau","Tis","Tamb","Tcr")
+head(dataF)
+
